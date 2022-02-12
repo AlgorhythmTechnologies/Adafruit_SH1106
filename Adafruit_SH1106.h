@@ -34,12 +34,27 @@ However, SH1106 driver don't provide several functions such as scroll commands.
   #define WIRE_WRITE Wire.send
 #endif
 
-#ifdef __SAM3X8E__
- typedef volatile RwReg PortReg;
- typedef uint32_t PortMask;
-#else
-  typedef volatile uint8_t PortReg;
-  typedef uint8_t PortMask;
+//#ifdef __SAM3X8E__
+// typedef volatile RwReg PortReg;
+// typedef uint32_t PortMask;
+//#else
+//  typedef volatile uint8_t PortReg;
+//  typedef uint8_t PortMask;
+//#endif
+
+#if defined(__AVR__)
+typedef volatile uint8_t PortReg;
+typedef uint8_t PortMask;
+#define HAVE_PORTREG
+#elif defined(__SAM3X8E__)
+typedef volatile RwReg PortReg;
+typedef uint32_t PortMask;
+#define HAVE_PORTREG
+#elif (defined(__arm__) || defined(ARDUINO_FEATHER52)) &&                      \
+    !defined(ARDUINO_ARCH_MBED) && !defined(ARDUINO_ARCH_RP2040)
+typedef volatile uint32_t PortReg;
+typedef uint32_t PortMask;
+#define HAVE_PORTREG
 #endif
 
 #include <SPI.h>
